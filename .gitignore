@@ -1,0 +1,7 @@
+# Mengabaikan folder unggahan lokal yang berisi file dinamis mahasiswa
+/uploads/*
+!/uploads/.gitkeep
+
+# Mengabaikan file sistem atau temporary
+.DS_Store
+Thumbs.db
