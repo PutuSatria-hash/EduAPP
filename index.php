@@ -839,11 +839,12 @@ function getAvatarColor(string $name): string {
                                                         class="action-btn btn-edit">
                                                         <i class="bi bi-pencil"></i>Edit
                                                     </a>
-                                                    <a href="hapus_mahasiswa.php?id=<?php echo $mhs['id']; ?>"
-                                                        class="action-btn btn-del"
-                                                        onclick="return confirmHapus('<?php echo $namaJs; ?>')">
+                                                    <button type="button" 
+                                                        class="action-btn btn-del btn-trigger-delete" 
+                                                        data-id="<?php echo $mhs['id']; ?>"
+                                                        data-nama="<?php echo htmlspecialchars($mhs['nama']); ?>">
                                                         <i class="bi bi-trash"></i>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -872,6 +873,31 @@ function getAvatarColor(string $name): string {
     <footer>
         &copy; 2024 EduApp &mdash; Web Dinamis dengan PHP Native, PDO, dan Bootstrap
     </footer>
+
+    <!-- Modal Konfirmasi Hapus Modern -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border-0" style="border-radius: 12px; overflow: hidden; box-shadow: none;">
+                <div class="modal-header border-0 bg-danger text-white py-3">
+                    <h5 class="modal-title fs-6 fw-bold" id="confirmDeleteModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Hapus
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="bi bi-trash-fill text-danger" style="font-size: 2.8rem; display: block; margin-bottom: 12px;"></i>
+                    <p class="mb-1 fw-semibold text-dark fs-6">Hapus data mahasiswa ini?</p>
+                    <p class="text-muted small mb-0 px-2" id="deleteStudentName" style="word-break: break-all; font-weight: 500;"></p>
+                </div>
+                <div class="modal-footer border-0 bg-light py-2 d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                    <a href="#" id="deleteConfirmBtn" class="btn btn-danger btn-sm px-3 fw-medium">
+                        <i class="bi bi-trash me-1"></i>Ya, Hapus
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -918,10 +944,23 @@ function getAvatarColor(string $name): string {
             });
         });
 
-        // ===== FIX KONFIRMASI HAPUS (safe dari apostrophe) =====
-        function confirmHapus(nama) {
-            return confirm('Hapus data mahasiswa "' + nama + '"?\nTindakan ini tidak dapat dibatalkan.');
-        }
+        // ===== KONFIRMASI HAPUS MODERN DENGAN MODAL =====
+        const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        const deleteStudentNameSpan = document.getElementById('deleteStudentName');
+        const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+
+        document.querySelectorAll('.btn-trigger-delete').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const nama = this.getAttribute('data-nama');
+                
+                deleteStudentNameSpan.textContent = '"' + nama + '"';
+                deleteConfirmBtn.setAttribute('href', 'hapus_mahasiswa.php?id=' + id);
+                
+                deleteModal.show();
+            });
+        });
 
         // ===== FEEDBACK TOMBOL SIMPAN =====
         document.getElementById('formMahasiswa').addEventListener('submit', function () {
